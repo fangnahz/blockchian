@@ -43,3 +43,26 @@ block = {
 这个哈希值是区块链技术的关键点：
 区块间用哈希关联，让区块链变成了**不可变**的数据结构。如果任何一个区块被改变，比如被入侵修改，该区块的哈希值就会变化，
 这个区块之后**所有**区块的 `previous_hash` 都变成了错误的哈希值。
+
+## **P**roof **o**f **W**ork (PoW)
+前面提到的 “证明 (proof)”。
+
+PoW：找到解决一个问题的数字
+
+算法要难计算，容易验证
+
+一个具体的例子：某个整数乘以另一个整数的哈希最后一位是 0
+
+```python
+import hashlib
+
+x = 5
+y = 0  # 从零开始，计算符合要求的数字
+
+while hashlib.sha256(f'{x*y}'.encode('utf-8')).hexdigest()[-1] != '0':
+    y += 1
+
+print(f'The solution is y = {y}')
+```
+
+比特币的 PoW 算法是 [Hashcash](https://en.wikipedia.org/wiki/Hashcash)。

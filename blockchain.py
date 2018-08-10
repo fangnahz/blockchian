@@ -2,6 +2,7 @@
 import hashlib
 import json
 import time
+import uuid
 
 
 class Blockchain(object):
@@ -59,3 +60,28 @@ class Blockchain(object):
         '''
         block_string = json.dumps(block, sort_keys=True).encode('utf-8')  # 排序序列化确保同一个字典哈希结果一致
         return hashlib.sha256(block_string).hexdigest()
+
+    def proof_of_work(self, last_proof):
+        '''
+        简单的 PoW 算法：
+         - 找到数字 p'，让 hash(p * p') 开始四位为 0，其中 p 是上一轮的 p'
+         - p 是上一轮的 proof，p' 是新 proof
+        :param last_proof: <int>
+        :return: <int>
+        '''
+        proof = 0  # 从零开始，直到找到满足条件的数字
+        while self.valid_proof(last_proof, proof) is False:
+            proof += 1
+        return proof
+
+    @staticmethod
+    def valid_proof(last_proof, proof):
+        '''
+        验证 proof: 检查 hash(last_proof, proof) 开头四位是不是 0
+        :param last_proof: <int> 上一轮的 proof
+        :param proof: <int> 当前 proof
+        :return: <bool> 正确为 True，否则为 False
+        '''
+        guess = f'{last_proof}{proof}'.encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:4] == '0000'
