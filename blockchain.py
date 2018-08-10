@@ -1,4 +1,7 @@
 # coding: utf-8
+import hashlib
+import json
+import time
 
 
 class Blockchain(object):
@@ -8,10 +11,25 @@ class Blockchain(object):
     def __init__(self):
         self.chain = []
         self.current_transactions = []
+        self.new_block(previous_hash=1, proof=100)  # 新建初始区块 (genesis block)
 
-    def new_block(self):
-        # 在区块链中新建、增加一个区块
-        pass
+    def new_block(self, proof, previous_hash=None):
+        '''
+        在区块链中新建区块
+        :param proof: <int> 工作证明算法提供的证明
+        :param previous_hash: (Optional) <str> 上一个区块的哈希
+        :return: <dict> 新区块
+        '''
+        block = {
+            'index': len(self.chain) + 1,
+            'timestamp': time.time(),
+            'transactions': self.current_transactions,
+            'proof': proof,
+            'previous_hash': previous_hash or self.hash(self.chain[-1])
+        }
+        self.current_transactions = []  # 重置当前交易记录
+        self.chain.append(block)
+        return block
 
     def new_transaction(self, sender, recipient, amount):
         '''
@@ -26,14 +44,18 @@ class Blockchain(object):
             'recipient': recipient,
             'amount': amount
         })
-        return self.last_block['index'] + 1  # 下一个挖矿目标的区块序号
-
-    @staticmethod
-    def hash(block):
-        # 计算一个区块的哈希值
-        pass
+        return self.last_block['index'] + 1  # 下一个挖矿目标的区块序号，后面提交交易记录时需要用到
 
     @property
     def last_block(self):
-        # 返回区块链的最后一个区块
-        pass
+        return self.chain[-1]
+
+    @staticmethod
+    def hash(block):
+        '''
+        创建一个区块的 SHA-256 哈希
+        :param block: <dict> Block
+        :return: <str>
+        '''
+        block_string = json.dumps(block, sort_keys=True).encode('utf-8')  # 排序序列化确保同一个字典哈希结果一致
+        return hashlib.sha256(block_string).hexdigest()
