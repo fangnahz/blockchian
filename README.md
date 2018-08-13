@@ -66,3 +66,41 @@ print(f'The solution is y = {y}')
 ```
 
 比特币的 PoW 算法是 [Hashcash](https://en.wikipedia.org/wiki/Hashcash)。
+
+## 记录交易 endpoint
+下面是用户提交给服务器的交易请求数据的一个例子：
+
+```
+{
+    "sender": "my adress",
+    "recipient": "someone else's adress",
+    "amount": 5
+}
+```
+
+## 挖矿 endpoint
+需要做三件事：
+1. 计算 PoW
+2. 奖励矿工，转帐 1 个 coin
+3. 把新区快加入区块链中
+
+
+## 共识
+区块链的核心目的是去中心化，需要
+**共识算法**来保证所有结点反映的是同一个区块链
+
+首先，需要让一个结点能够记录网络中其他结点：在 Blockchain 类中增加记录所有结点的实例变量，增加更新所有结点列表的方法
+
+增加新 endpoint 用于更新结点列表
+
+增加新 endpoint 用于解决冲突，保证结点存储的是正确的区块链
+
+### 冲突
+一个结点保存的区块链与另一个结点不同。解决的原则是以最长的合法区块链为准。
+解决冲突的方法会轮训网络中所有结点，下载每个结点的区块链，验证是否合法，如果找到新的更长的合法区块链，就用找到的区块链替换当前结点的区块链。
+
+
+## Notes
+`'/transactions/new'` 端点代码中使用了 `request.get_json()`，如果用 requests 库发请求，交易参数需要写在 post 请求的 `json` 参数中
+
+Flask debug 可以在端点函数中写断点，然后在服务段 interactive shell 中检查
